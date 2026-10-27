@@ -4,12 +4,23 @@ on:
   push:
     tags:
       - 'tqp-v*'
+  workflow_dispatch:
+    inputs:
+      jobs:
+        description: 'Which builds to run (tag pushes always run all)'
+        required: true
+        default: 'windows-cuda'
+        type: choice
+        options:
+          - windows-cuda
+          - all
 
 env:
   CMAKE_ARGS: "-DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_TOOLS=ON -DLLAMA_BUILD_SERVER=ON"
 
 jobs:
   macos-metal:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' }}
     runs-on: macos-14
 
     steps:
@@ -41,6 +52,7 @@ jobs:
           path: turboquant-plus-${{ github.ref_name }}-macos-arm64-metal.tar.gz
 
   windows-cuda:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || inputs.jobs == 'windows-cuda' }}
     runs-on: windows-2022
 
     strategy:
@@ -88,6 +100,7 @@ jobs:
           path: turboquant-plus-${{ github.ref_name }}-windows-x64-cuda${{ matrix.cuda }}.zip
 
   linux-cpu:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' }}
     runs-on: ubuntu-22.04
 
     steps:
@@ -125,6 +138,7 @@ jobs:
           path: turboquant-plus-${{ github.ref_name }}-linux-x64-cpu.tar.gz
 
   linux-vulkan:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' }}
     runs-on: ubuntu-22.04
 
     steps:
@@ -165,6 +179,9 @@ jobs:
           path: turboquant-plus-${{ github.ref_name }}-linux-x64-vulkan.tar.gz
 
   release:
+    # Button pushes (workflow_dispatch) upload artifacts but never cut a
+    # release; only tag pushes publish. Skipped build jobs satisfy `needs`.
+    if: startsWith(github.ref, 'refs/tags/')
     needs: [macos-metal, windows-cuda, linux-cpu, linux-vulkan]
     runs-on: ubuntu-latest
     permissions:
