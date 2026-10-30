@@ -118,7 +118,7 @@ jobs:
 
       - name: Dependencies
         run: |
-          apt-get update && apt-get install -y build-essential libssl-dev ninja-build
+          apt-get update && apt-get install -y build-essential libssl-dev ninja-build cmake
 
       - name: Build
         run: |
