@@ -82,7 +82,7 @@ jobs:
             -DGGML_NATIVE=OFF ^
             -DGGML_CUDA=ON ^
             -DGGML_CUDA_FA_ALL_QUANTS=ON ^
-            -DCMAKE_CUDA_ARCHITECTURES="80-real;86-real;87-real;89-real;90-real;90-virtual" ^
+            -DCMAKE_CUDA_ARCHITECTURES="80-real;86-real;89-real;90-real;90-virtual" ^
             -DLLAMA_BUILD_BORINGSSL=ON ^
             ${{ env.CMAKE_ARGS }}
           set /A NINJA_JOBS=%NUMBER_OF_PROCESSORS%-1
