@@ -9,10 +9,12 @@ on:
       jobs:
         description: 'Which builds to run (tag pushes always run all)'
         required: true
-        default: 'windows-cuda'
+        default: 'windows+linux'
         type: choice
         options:
           - windows-cuda
+          - linux
+          - windows+linux
           - all
 
 env:
@@ -52,7 +54,7 @@ jobs:
           path: turboquant-plus-${{ github.ref_name }}-macos-arm64-metal.tar.gz
 
   windows-cuda:
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || inputs.jobs == 'windows-cuda' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs != 'linux' }}
     runs-on: windows-2022
 
     strategy:
@@ -101,7 +103,7 @@ jobs:
           path: turboquant-plus-${{ github.ref_name }}-windows-x64-cuda${{ matrix.cuda }}.zip
 
   linux-cpu:
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs != 'windows-cuda' }}
     runs-on: ubuntu-22.04
 
     steps:
@@ -139,7 +141,7 @@ jobs:
           path: turboquant-plus-${{ github.ref_name }}-linux-x64-cpu.tar.gz
 
   linux-vulkan:
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs != 'windows-cuda' }}
     runs-on: ubuntu-22.04
 
     steps:
